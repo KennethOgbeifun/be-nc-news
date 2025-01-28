@@ -1,9 +1,19 @@
-const { fetchListOfEndPoints } = require("../models/model");
+const { fetchListOfEndPoints, fetchAllTopics } = require("../models/model");
+const endpoints = require("../endpoints.json");
+const data = require("../db/data/development-data/index");
 
 function getListOfEndpoints(req, res, next) {
-  return fetchListOfEndPoints()
-    .then((data) => {
-      res.status(200).send({ endpoints: data });
+  try {
+    res.status(200).send({ endpoints: endpoints });
+  } catch (err) {
+    next(err);
+  }
+}
+
+function getListOfTopics(req, res, next) {
+  return fetchAllTopics()
+    .then((topics) => {
+      res.status(200).send(topics);
     })
     .catch((err) => {
       next(err);
@@ -12,4 +22,5 @@ function getListOfEndpoints(req, res, next) {
 
 module.exports = {
   getListOfEndpoints,
+  getListOfTopics,
 };
