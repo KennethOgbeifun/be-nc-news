@@ -7,12 +7,8 @@ const seed = require("../db/seeds/seed");
 const db = require("../db/connection");
 
 /* Set up your beforeEach & afterAll functions here */
-beforeEach(() => {
-  return seed(testData);
-});
-afterAll(() => {
-  return db.end();
-});
+beforeEach(() => seed(testData));
+afterAll(() => db.end());
 
 describe("GET /api", () => {
   test("200: Responds with an object detailing the documentation for each endpoint", () => {
@@ -31,6 +27,17 @@ describe("GET /api/topics", () => {
       .expect(200)
       .then((response) => {
         expect(response.body).toEqual(testData.topicData);
+        expect(response.body.length).toBe(testData.topicData.length);
+      });
+  });
+});
+describe("general endpoint errors", () => {
+  test("400: send a 400 status and error message when given an invalid endpoint", () => {
+    return request(app)
+      .get("/api/topi")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.error).toBe("Endpoint Not Found");
       });
   });
 });
