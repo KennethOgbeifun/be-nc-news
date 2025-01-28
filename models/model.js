@@ -1,7 +1,10 @@
 const endPoints = require("../endpoints.json");
+const db = require("../db/connection");
 
-function fetchListOfEndPoints() {
-  return Promise.resolve(endPoints);
+function fetchAllTopics() {
+  return db.query(`SELECT * FROM topics`).then(({ rows }) => {
+    return rows;
+  });
 }
 
-module.exports = { fetchListOfEndPoints };
+module.exports = { fetchAllTopics };
