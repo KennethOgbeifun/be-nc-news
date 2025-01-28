@@ -3,6 +3,7 @@ const app = express();
 const {
   getListOfEndpoints,
   getListOfTopics,
+  getArticle,
 } = require("./controllers/controller");
 const port = 3000;
 app.use(express.json());
@@ -10,6 +11,8 @@ app.use(express.json());
 app.get("/api", getListOfEndpoints);
 
 app.get("/api/topics", getListOfTopics);
+
+app.get("/api/articles/:article_id", getArticle);
 
 app.all("*", (req, res) => {
   res.status(404).send({ error: "Endpoint Not Found" });

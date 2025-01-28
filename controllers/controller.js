@@ -1,4 +1,4 @@
-const { fetchListOfEndPoints, fetchAllTopics } = require("../models/model");
+const { fetchAllTopics, fetchArticle } = require("../models/model");
 const endpoints = require("../endpoints.json");
 const data = require("../db/data/development-data/index");
 
@@ -20,7 +20,17 @@ function getListOfTopics(req, res, next) {
     });
 }
 
+function getArticle(req, res, next) {
+  const id = req.params.id;
+  return fetchArticle(id)
+    .then((article) => {
+      res.status(200).send(article);
+    })
+    .catch((err) => next(err));
+}
+
 module.exports = {
   getListOfEndpoints,
   getListOfTopics,
+  getArticle,
 };
