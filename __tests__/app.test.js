@@ -78,21 +78,33 @@ describe.only("GET /api/articles/:article_id", () => {
         });
       });
   });
-  xdescribe("Error handling", () => {
+  describe("Error handling", () => {
     test("404: send a 404 status and error message when given a valid but non-existent id", () => {
       return request(app)
         .get("/api/articles/2025")
         .expect(404)
         .then((response) => {
-          expect(response.body.error).toBe("Article does not exist");
+          console.log(response.body);
+
+          expect(response.body.msg).toBe(
+            "Article not found for article_id: 2025"
+          );
         });
     });
     test("400: send a 400 status and error message when given an invalid id", () => {
       return request(app)
-        .get("/api/articles/my-article")
+        .get("/api/articles/-")
         .expect(400)
         .then((response) => {
-          expect(response.body.error).toBe("Bad request");
+          expect(response.body.msg).toBe("Bad request");
+        });
+    });
+    test("400: send a 400 status and error message when given an invalid id", () => {
+      return request(app)
+        .get("/api/articles/notanarticle")
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("Bad request");
         });
     });
   });

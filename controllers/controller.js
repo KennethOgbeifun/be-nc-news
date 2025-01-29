@@ -21,7 +21,8 @@ function getListOfTopics(req, res, next) {
 }
 
 function getArticle(req, res, next) {
-  const id = req.params.id;
+  const id = req.params.article_id;
+
   return fetchArticle(id)
     .then((article) => {
       res.status(200).send(article);

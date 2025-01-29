@@ -9,11 +9,18 @@ function fetchAllTopics() {
 
 function fetchArticle(id) {
   return db
-    .query(`SELECT * FROM articles WHERE article_id=1;`)
+    .query("SELECT * FROM articles WHERE article_id = $1;", [id])
     .then(({ rows }) => {
-      console.log(rows, ",,,,,, response");
-
-      return rows[0];
+      const article = rows[0];
+      if (!article) {
+        return Promise.reject({
+          status: 404,
+          error: "Article not found",
+          msg: `Article not found for article_id: ${id}`,
+        });
+      } else {
+        return rows[0];
+      }
     });
 }
 
