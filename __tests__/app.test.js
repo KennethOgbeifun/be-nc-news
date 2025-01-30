@@ -315,9 +315,72 @@ describe("GET /api/articles/", () => {
         .get("/api/wee")
         .expect(404)
         .then((response) => {
-          console.log(response.body);
-
           expect(response.body.msg).toBe("Endpoint Not Found");
+        });
+    });
+  });
+});
+
+describe("GET /api/articles/:article_id/commments", () => {
+  test("200: Responds with the correct article", () => {
+    return request(app)
+      .get("/api/articles/3/comments")
+      .expect(200)
+      .then((response) => {
+        expect(response.body).toEqual([
+          {
+            comment_id: 11,
+            votes: 0,
+            created_at: "2020-09-19T23:10:00.000Z",
+            author: "icellusedkars",
+            body: "Ambidextrous marsupial",
+            article_id: 3,
+          },
+          {
+            comment_id: 10,
+            votes: 0,
+            created_at: "2020-06-20T07:24:00.000Z",
+            author: "icellusedkars",
+            body: "git push origin master",
+            article_id: 3,
+          },
+        ]);
+      });
+  });
+  test("200: Article response has correct properties", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then((response) => {
+        response.body.forEach((element) => {
+          expect(element).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            article_id: expect.any(Number),
+          });
+        });
+      });
+  });
+  test("200: Responds with all the comments sorted by date in desc order", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then((response) => {
+        expect(response.body).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  describe("Error handling", () => {
+    test("404: send a 404 status and error message when given a valid but non-existent id", () => {
+      return request(app)
+        .get("/api/articles/1994/comments")
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe(
+            "Article not found for article_id: 1994"
+          );
         });
     });
   });

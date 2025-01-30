@@ -2,6 +2,7 @@ const {
   fetchAllTopics,
   fetchArticle,
   fetchAllArticles,
+  fetchArticleComments,
 } = require("../models/model");
 const endpoints = require("../endpoints.json");
 const data = require("../db/data/development-data/index");
@@ -44,9 +45,22 @@ function getAllArticles(req, res, next) {
     });
 }
 
+function getArticleComments(req, res, next) {
+  const id = req.params.article_id;
+
+  return fetchArticleComments(id)
+    .then((comments) => {
+      res.status(200).send(comments);
+    })
+    .catch((err) => {
+      next(err);
+    });
+}
+
 module.exports = {
   getListOfEndpoints,
   getListOfTopics,
   getArticle,
   getAllArticles,
+  getArticleComments,
 };
