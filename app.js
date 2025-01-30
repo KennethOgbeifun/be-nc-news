@@ -5,6 +5,7 @@ const {
   getListOfTopics,
   getArticle,
   getAllArticles,
+  getArticleComments,
 } = require("./controllers/controller");
 const port = 3000;
 app.use(express.json());
@@ -16,6 +17,8 @@ app.get("/api/topics", getListOfTopics);
 app.get("/api/articles/:article_id", getArticle);
 
 app.get("/api/articles", getAllArticles);
+
+app.get("/api/articles/:article_id/comments", getArticleComments);
 
 app.all("*", (req, res) => {
   res.status(404).send({ msg: "Endpoint Not Found" });
