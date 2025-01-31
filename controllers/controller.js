@@ -6,6 +6,7 @@ const {
   handleComment,
   handleArticle,
   removeComment,
+  fetchUsers,
 } = require("../models/model");
 const endpoints = require("../endpoints.json");
 const data = require("../db/data/development-data/index");
@@ -97,6 +98,16 @@ function deleteComment(req, res, next) {
     });
 }
 
+function getUsers(req, res, next) {
+  return fetchUsers()
+    .then((users) => {
+      res.status(200).send(users);
+    })
+    .catch((err) => {
+      next(err);
+    });
+}
+
 module.exports = {
   getListOfEndpoints,
   getListOfTopics,
@@ -106,4 +117,5 @@ module.exports = {
   postComment,
   patchArticle,
   deleteComment,
+  getUsers,
 };
