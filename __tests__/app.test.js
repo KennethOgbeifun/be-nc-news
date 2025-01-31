@@ -497,8 +497,6 @@ describe("PATCH /api/articles/:article_id", () => {
       })
       .expect(200)
       .then((response) => {
-        console.log(response.body);
-
         expect(response.body).toMatchObject([
           {
             article_id: 3,
@@ -558,6 +556,39 @@ describe("PATCH /api/articles/:article_id", () => {
           expect(response.body.msg).toBe(
             "Article not found for article_id: 999"
           );
+        });
+    });
+  });
+});
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("204: Successfully deletes the comment ", () => {
+    return request(app).delete("/api/comments/3").expect(204);
+  });
+
+  describe("Error handling", () => {
+    test("404: should return an error when trying to delete a comment that doesnt exist", () => {
+      return request(app)
+        .delete("/api/comments/999")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Comment not found");
+        });
+    });
+    test("400: sends a 400 status and a Bad request error message if comment_id is not valid (NAN)", () => {
+      return request(app)
+        .delete("/api/comments/-")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Bad request");
+        });
+    });
+    test("404: sends a 404 status and a  Not Found error message if /comment in endpoint is not correctly spelt", () => {
+      return request(app)
+        .delete("/api/commens/1")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Endpoint Not Found");
         });
     });
   });

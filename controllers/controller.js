@@ -5,6 +5,7 @@ const {
   fetchArticleComments,
   handleComment,
   handleArticle,
+  removeComment,
 } = require("../models/model");
 const endpoints = require("../endpoints.json");
 const data = require("../db/data/development-data/index");
@@ -84,6 +85,18 @@ function patchArticle(req, res, next) {
     });
 }
 
+function deleteComment(req, res, next) {
+  const { comment_id } = req.params;
+
+  removeComment(comment_id)
+    .then(() => {
+      res.status(204).send();
+    })
+    .catch((err) => {
+      next(err);
+    });
+}
+
 module.exports = {
   getListOfEndpoints,
   getListOfTopics,
@@ -92,4 +105,5 @@ module.exports = {
   getArticleComments,
   postComment,
   patchArticle,
+  deleteComment,
 };
