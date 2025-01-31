@@ -393,8 +393,6 @@ describe("POST /api/articles/:article_id/commments", () => {
       })
       .expect(201)
       .then((response) => {
-        console.log(response.body);
-
         expect(response.body).toMatchObject([
           {
             comment_id: expect.any(Number),
@@ -485,6 +483,80 @@ describe("POST /api/articles/:article_id/commments", () => {
         .then((response) => {
           expect(response.body.msg).toBe(
             "Missing fields required: username and body"
+          );
+        });
+    });
+  });
+});
+describe("PATCH /api/articles/:article_id", () => {
+  test("200: Responds with the amended article", () => {
+    return request(app)
+      .patch("/api/articles/3")
+      .send({
+        inc_votes: 50,
+      })
+      .expect(200)
+      .then((response) => {
+        console.log(response.body);
+
+        expect(response.body).toMatchObject([
+          {
+            article_id: 3,
+            title: "Eight pug gifs that remind me of mitch",
+            topic: "mitch",
+            author: "icellusedkars",
+            created_at: "2020-11-03T09:12:00.000Z",
+            votes: 50,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          },
+        ]);
+      });
+  });
+  describe("Error handling", () => {
+    test("400: should return an error when inc_votes is mising", () => {
+      return request(app)
+        .patch("/api/articles/3")
+        .send({})
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe(
+            "Bad request: inc_votes must be a number"
+          );
+        });
+    });
+    test("400: should return an error when inc_votes is not a number", () => {
+      return request(app)
+        .patch("/api/articles/3")
+        .send({ inc_votes: "nan" })
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe(
+            "Bad request: inc_votes must be a number"
+          );
+        });
+    });
+    test("400: sends a 400 status and a Bad request error message if article_id is not valid (NAN)", () => {
+      return request(app)
+        .patch("/api/articles/-")
+        .send({
+          inc_votes: 1,
+        })
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("Bad request");
+        });
+    });
+    test("404: sends a 404 status and bad request error when article_id does not exist", () => {
+      return request(app)
+        .patch("/api/articles/999")
+        .send({
+          inc_votes: 1,
+        })
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe(
+            "Article not found for article_id: 999"
           );
         });
     });

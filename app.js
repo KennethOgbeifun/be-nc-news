@@ -7,6 +7,7 @@ const {
   getAllArticles,
   getArticleComments,
   postComment,
+  patchArticle,
 } = require("./controllers/controller");
 const port = 3000;
 app.use(express.json());
@@ -22,6 +23,8 @@ app.get("/api/articles", getAllArticles);
 app.get("/api/articles/:article_id/comments", getArticleComments);
 
 app.post("/api/articles/:article_id/comments", postComment);
+
+app.patch("/api/articles/:article_id", patchArticle);
 
 app.all("*", (req, res) => {
   res.status(404).send({ msg: "Endpoint Not Found" });
@@ -45,6 +48,14 @@ app.use((err, req, res, next) => {
 
 app.use((err, req, res, next) => {
   if (err.status === 400 && err.error === "Bad request") {
+    res.status(err.status).send({ msg: err.msg });
+  } else {
+    next(err);
+  }
+});
+
+app.use((err, req, res, next) => {
+  if (err.status === 400 && err.error === "Bad request inc_votes") {
     res.status(err.status).send({ msg: err.msg });
   } else {
     next(err);

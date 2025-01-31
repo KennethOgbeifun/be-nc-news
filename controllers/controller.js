@@ -4,6 +4,7 @@ const {
   fetchAllArticles,
   fetchArticleComments,
   handleComment,
+  handleArticle,
 } = require("../models/model");
 const endpoints = require("../endpoints.json");
 const data = require("../db/data/development-data/index");
@@ -70,6 +71,19 @@ function postComment(req, res, next) {
     });
 }
 
+function patchArticle(req, res, next) {
+  const { article_id } = req.params;
+  const { inc_votes } = req.body;
+
+  return handleArticle(article_id, inc_votes)
+    .then((article) => {
+      res.status(200).send(article);
+    })
+    .catch((err) => {
+      next(err);
+    });
+}
+
 module.exports = {
   getListOfEndpoints,
   getListOfTopics,
@@ -77,4 +91,5 @@ module.exports = {
   getAllArticles,
   getArticleComments,
   postComment,
+  patchArticle,
 };
