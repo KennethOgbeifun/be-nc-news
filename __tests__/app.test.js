@@ -593,3 +593,35 @@ describe("DELETE /api/comments/:comment_id", () => {
     });
   });
 });
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("200: returns an array of user objects with the correct properties ", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.users.length).toBeGreaterThan(0);
+        expect(body.users).toEqual();
+        console.log(body.users);
+
+        body.users.forEach((user) => {
+          expect(user).toMatchObject({
+            username: expect.any(String),
+            name: expect.any(String),
+            avatar_url: expect.any(String),
+          });
+        });
+      });
+  });
+});
+
+describe("Error handling", () => {
+  test("404: sends a 404 status and a  Not Found error message if /comment in endpoint is not correctly spelt", () => {
+    return request(app)
+      .delete("/api/users")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Endpoint Not Found");
+      });
+  });
+});

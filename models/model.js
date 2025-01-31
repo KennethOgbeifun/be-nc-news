@@ -184,6 +184,15 @@ function removeComment(comment_id) {
     });
 }
 
+function fetchUsers() {
+  return db.query(`SELECT * FROM users;`).then(({ rows }) => {
+    if (rows.length === 0) {
+      return Promise.reject({ status: 404, msg: "Users not found" });
+    }
+    return rows;
+  });
+}
+
 module.exports = {
   fetchAllTopics,
   fetchArticle,
@@ -192,4 +201,5 @@ module.exports = {
   handleComment,
   handleArticle,
   removeComment,
+  fetchUsers,
 };
