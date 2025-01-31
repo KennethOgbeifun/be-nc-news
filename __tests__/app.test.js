@@ -10,7 +10,7 @@ const { string } = require("pg-format");
 /* Set up your beforeEach & afterAll functions here */
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
-
+//need to write more tests, clean up existing tests; fix titles, delete repeats/not needed
 describe("General endpoint errors", () => {
   test("400: send a 400 status and error message when given an invalid endpoint", () => {
     return request(app)
@@ -103,8 +103,6 @@ describe("GET /api/articles/:article_id", () => {
         .get("/api/articles/2025")
         .expect(404)
         .then((response) => {
-          console.log(response.body);
-
           expect(response.body.msg).toBe(
             "Article not found for article_id: 2025"
           );
@@ -322,7 +320,7 @@ describe("GET /api/articles/", () => {
 });
 
 describe("GET /api/articles/:article_id/commments", () => {
-  test("200: Responds with the correct article", () => {
+  test("200: Responds with the correct articles comments", () => {
     return request(app)
       .get("/api/articles/3/comments")
       .expect(200)
@@ -347,7 +345,7 @@ describe("GET /api/articles/:article_id/commments", () => {
         ]);
       });
   });
-  test("200: Article response has correct properties", () => {
+  test("200: Comment response has correct properties", () => {
     return request(app)
       .get("/api/articles/1/comments")
       .expect(200)
@@ -380,6 +378,113 @@ describe("GET /api/articles/:article_id/commments", () => {
         .then((response) => {
           expect(response.body.msg).toBe(
             "Article not found for article_id: 1994"
+          );
+        });
+    });
+  });
+});
+describe("POST /api/articles/:article_id/commments", () => {
+  test("201: Responds with the correct posted comment", () => {
+    return request(app)
+      .post("/api/articles/3/comments")
+      .send({
+        username: "butter_bridge",
+        body: "this is a test",
+      })
+      .expect(201)
+      .then((response) => {
+        console.log(response.body);
+
+        expect(response.body).toMatchObject([
+          {
+            comment_id: expect.any(Number),
+            votes: 0,
+            created_at: expect.any(String),
+            author: "butter_bridge",
+            body: "this is a test",
+            article_id: 3,
+          },
+        ]);
+      });
+  });
+  test("201: Responds with all the comments with the new comment added", () => {
+    return request(app)
+      .post("/api/articles/3/comments")
+      .send({
+        username: "butter_bridge",
+        body: "this is a test",
+      })
+      .then(() => {
+        return request(app)
+          .get("/api/articles/3/comments")
+          .expect(200)
+          .then((response) => {
+            expect(response.body).toEqual([
+              {
+                article_id: 3,
+                author: "butter_bridge",
+                body: "this is a test",
+                comment_id: 19,
+                created_at: expect.any(String),
+                votes: 0,
+              },
+              {
+                article_id: 3,
+                author: "icellusedkars",
+                body: "Ambidextrous marsupial",
+                comment_id: 11,
+                created_at: "2020-09-19T23:10:00.000Z",
+                votes: 0,
+              },
+              {
+                article_id: 3,
+                author: "icellusedkars",
+                body: "git push origin master",
+                comment_id: 10,
+                created_at: "2020-06-20T07:24:00.000Z",
+                votes: 0,
+              },
+            ]);
+          });
+      });
+  });
+  describe("Error handling", () => {
+    test("404: send a 404 status and error message if article does not exist", () => {
+      return request(app)
+        .post("/api/articles/1994/comments")
+        .send({
+          username: "butter_bridge",
+          body: "this is a test",
+        })
+        .expect(404)
+        .then((response) => {
+          expect(response.body.msg).toBe(
+            "Article not found for article_id: 1994"
+          );
+        });
+    });
+    test("400: send a 400 status and a Bad request error message if article_id is not valid (NAN)", () => {
+      return request(app)
+        .post("/api/articles/-/comments")
+        .send({
+          username: "butter_bridge",
+          body: "this is a test",
+        })
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("Bad request");
+        });
+    });
+    test("400: send a 400 status and a Missing fields required: username and body error message if body or username field is mising from post", () => {
+      return request(app)
+        .post("/api/articles/3/comments")
+        .send({
+          username: "butter_bridge",
+        })
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe(
+            "Missing fields required: username and body"
           );
         });
     });

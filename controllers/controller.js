@@ -3,6 +3,7 @@ const {
   fetchArticle,
   fetchAllArticles,
   fetchArticleComments,
+  handleComment,
 } = require("../models/model");
 const endpoints = require("../endpoints.json");
 const data = require("../db/data/development-data/index");
@@ -57,10 +58,23 @@ function getArticleComments(req, res, next) {
     });
 }
 
+function postComment(req, res, next) {
+  const { article_id } = req.params;
+  const { username, body } = req.body;
+  return handleComment(article_id, username, body)
+    .then((comment) => {
+      res.status(201).send(comment);
+    })
+    .catch((err) => {
+      next(err);
+    });
+}
+
 module.exports = {
   getListOfEndpoints,
   getListOfTopics,
   getArticle,
   getAllArticles,
   getArticleComments,
+  postComment,
 };

@@ -52,6 +52,7 @@ function fetchArticleComments(article_id) {
   if (isNaN(Number(article_id))) {
     return Promise.reject({
       status: 400,
+      error: "Bad request",
       msg: "Bad request",
     });
   }
@@ -85,9 +86,52 @@ function fetchArticleComments(article_id) {
     });
 }
 
+function handleComment(article_id, username, body) {
+  //need to make into function
+  if (isNaN(Number(article_id))) {
+    return Promise.reject({
+      status: 400,
+      error: "Bad request",
+      msg: "Bad request",
+    });
+  }
+  //need to make into function
+  if (!username || !body) {
+    return Promise.reject({
+      status: 400,
+      error: "Missing fields",
+      msg: "Missing fields required: username and body",
+    });
+  }
+
+  return db
+    .query(`SELECT * FROM articles WHERE article_id = $1;`, [article_id])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({
+          status: 404,
+          error: "Article not found",
+          msg: `Article not found for article_id: ${article_id}`,
+        });
+      }
+    })
+    .then(() => {
+      return db.query(
+        `INSERT INTO comments (author, body, article_id)
+        VALUES ($1,$2,$3)
+        RETURNING comment_id, votes, created_at, author, body, article_id;`,
+        [username, body, article_id]
+      );
+    })
+    .then(({ rows }) => {
+      return rows;
+    });
+}
+
 module.exports = {
   fetchAllTopics,
   fetchArticle,
   fetchAllArticles,
   fetchArticleComments,
+  handleComment,
 };
