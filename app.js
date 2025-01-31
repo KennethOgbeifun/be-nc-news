@@ -8,6 +8,7 @@ const {
   getArticleComments,
   postComment,
   patchArticle,
+  deleteComment,
 } = require("./controllers/controller");
 const port = 3000;
 app.use(express.json());
@@ -26,6 +27,8 @@ app.post("/api/articles/:article_id/comments", postComment);
 
 app.patch("/api/articles/:article_id", patchArticle);
 
+app.delete("/api/comments/:comment_id", deleteComment);
+
 app.all("*", (req, res) => {
   res.status(404).send({ msg: "Endpoint Not Found" });
 });
@@ -40,6 +43,13 @@ app.use((err, req, res, next) => {
 
 app.use((err, req, res, next) => {
   if (err.status === 404 && err.error === "Article not found") {
+    res.status(err.status).send({ msg: err.msg });
+  } else {
+    next(err);
+  }
+});
+app.use((err, req, res, next) => {
+  if (err.status === 404) {
     res.status(err.status).send({ msg: err.msg });
   } else {
     next(err);
@@ -71,7 +81,7 @@ app.use((err, req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  console.log(err, "You have not accounted for this error yet!");
+  console.log(err, err.error, "You have not accounted for this error yet!");
   response.status(500).send({ msg: "Internal Server error" });
 });
 
