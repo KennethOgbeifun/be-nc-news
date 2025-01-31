@@ -594,34 +594,48 @@ describe("DELETE /api/comments/:comment_id", () => {
   });
 });
 
-describe("DELETE /api/comments/:comment_id", () => {
+describe("GET /api/users", () => {
   test("200: returns an array of user objects with the correct properties ", () => {
     return request(app)
       .get("/api/users")
       .expect(200)
-      .then(({ body }) => {
-        expect(body.users.length).toBeGreaterThan(0);
-        expect(body.users).toEqual();
-        console.log(body.users);
-
-        body.users.forEach((user) => {
-          expect(user).toMatchObject({
-            username: expect.any(String),
-            name: expect.any(String),
-            avatar_url: expect.any(String),
-          });
-        });
+      .then((response) => {
+        expect(response.body).toEqual([
+          {
+            username: "butter_bridge",
+            name: "jonny",
+            avatar_url:
+              "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
+          },
+          {
+            username: "icellusedkars",
+            name: "sam",
+            avatar_url:
+              "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4",
+          },
+          {
+            username: "rogersop",
+            name: "paul",
+            avatar_url:
+              "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4",
+          },
+          {
+            username: "lurker",
+            name: "do_nothing",
+            avatar_url:
+              "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+          },
+        ]);
       });
   });
-});
-
-describe("Error handling", () => {
-  test("404: sends a 404 status and a  Not Found error message if /comment in endpoint is not correctly spelt", () => {
-    return request(app)
-      .delete("/api/users")
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.msg).toBe("Endpoint Not Found");
-      });
+  describe("Error handling", () => {
+    test("404: sends a 404 status and a  Not Found error message if /comment in endpoint is not correctly spelt", () => {
+      return request(app)
+        .delete("/api/users")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Endpoint Not Found");
+        });
+    });
   });
 });
