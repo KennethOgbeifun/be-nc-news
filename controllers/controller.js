@@ -40,7 +40,8 @@ function getArticle(req, res, next) {
 }
 
 function getAllArticles(req, res, next) {
-  return fetchAllArticles()
+  const queries = req.query;
+  return fetchAllArticles(queries)
     .then((articles) => {
       res.status(200).send(articles);
     })

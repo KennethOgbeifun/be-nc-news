@@ -26,26 +26,51 @@ function fetchArticle(id) {
     });
 }
 
-function fetchAllArticles() {
-  return db
-    .query(
-      `
-    SELECT articles.article_id,
-    title,
-    topic,
-    articles.author,
-    articles.created_at,
-    articles.votes,
-    article_img_url,
-    COUNT(comments.comment_id)::INT AS comment_count
-    FROM articles
-    LEFT JOIN comments ON articles.article_id = comments.article_id
-    GROUP BY articles.article_id
-    ORDER BY articles.created_at DESC`
-    )
-    .then(({ rows }) => {
-      return rows;
-    });
+function fetchAllArticles(queries) {
+  const sort_by = queries.sort_by || "created_at";
+  const order = queries.order === "desc" ? "DESC" : "ASC";
+
+  let SQLstring = `
+  SELECT articles.article_id,
+  title,
+  topic,
+  articles.author,
+  articles.created_at,
+  articles.votes,
+  article_img_url,
+  COUNT(comments.comment_id)::INT AS comment_count
+  FROM articles
+  LEFT JOIN comments ON articles.article_id = comments.article_id
+  GROUP BY articles.article_id`;
+
+  let args = [];
+
+  if (sort_by) {
+    const greenList = [
+      "articles.article_id",
+      "title",
+      "topic",
+      "articles.author",
+      "articles.created_at",
+      "articles.votes",
+      "comment_count",
+    ];
+    if (!greenList.includes(sort_by)) {
+      Promise.reject({
+        status: 400,
+        error: "Invalid query",
+        msg: "Invalid sort query",
+      });
+    } else if (greenList.includes(sort_by)) {
+      SQLstring += ` ORDER BY ${sort_by} ${order}`;
+    }
+  } else {
+    SQLstring += ` ORDER BY articles.created_at DESC`;
+  }
+
+  return db.query(SQLstring, args).then(({ rows }) => {
+    return rows;
+  });
 }
 
 function fetchArticleComments(article_id) {

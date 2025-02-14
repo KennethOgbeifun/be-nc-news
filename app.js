@@ -82,6 +82,21 @@ app.use((err, req, res, next) => {
     next(err);
   }
 });
+app.use((err, req, res, next) => {
+  if (err.status === 400 && err.error === "Invalid sort query") {
+    res.status(err.status).send({ msg: err.msg });
+  } else {
+    next(err);
+  }
+});
+
+app.use((err, req, res, next) => {
+  if (err.status === 400 && err.error === "Invalid order query") {
+    res.status(err.status).send({ msg: err.msg });
+  } else {
+    next(err);
+  }
+});
 
 app.use((err, req, res, next) => {
   console.log(err, err.error, "You have not accounted for this error yet!");

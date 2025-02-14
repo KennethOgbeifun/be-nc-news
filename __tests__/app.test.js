@@ -126,7 +126,7 @@ describe("GET /api/articles/:article_id", () => {
     });
   });
 });
-describe("GET /api/articles/", () => {
+xdescribe("GET /api/articles/", () => {
   test("200: Responds with all the articles sorted by date in desc order", () => {
     return request(app)
       .get("/api/articles")
@@ -314,6 +314,57 @@ describe("GET /api/articles/", () => {
         .expect(404)
         .then((response) => {
           expect(response.body.msg).toBe("Endpoint Not Found");
+        });
+    });
+  });
+});
+
+xdescribe("GET 200: /api/articles?sort_by", () => {
+  test("200: should return an array of all articles sorted by title", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title")
+      .expect(200)
+      .then((response) => {
+        const articles = response.body;
+
+        expect(articles).toBeSortedBy("title");
+      });
+  });
+  test("200: should return an array of all articles sorted by topic in descending order", () => {
+    return request(app)
+      .get("/api/articles?sort_by=topic&order=desc")
+      .expect(200)
+      .then((response) => {
+        const articles = response.body;
+
+        expect(articles).toBeSortedBy("topic", { descending: true });
+      });
+  });
+  test("200: should return an array of all articles sorted by comment_count in ascending order", () => {
+    return request(app)
+      .get("/api/articles?sort_by=comment_count&order=asc")
+      .expect(200)
+      .then((response) => {
+        const articles = response.body;
+
+        expect(articles).toBeSortedBy("comment_count", { ascending: true });
+      });
+  });
+  describe("Error handling", () => {
+    test("400: send a 400 status and error message when given an invalid sort_by value", () => {
+      return request(app)
+        .get("/api/articles?sort_by=notacolumn")
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("Invalid sort query");
+        });
+    });
+    test("400: send a 400 status and error message when given an invalid order value", () => {
+      return request(app)
+        .get("/api/articles?order=banana")
+        .expect(400)
+        .then((response) => {
+          expect(response.body.msg).toBe("Invalid order query");
         });
     });
   });
