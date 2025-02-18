@@ -26,24 +26,25 @@ function fetchArticle(id) {
     });
 }
 
-function fetchAllArticles(queries) {
-  const sort_by = queries.sort_by || "created_at";
-  const order = queries.order === "desc" ? "DESC" : "ASC";
+function fetchAllArticles(queries = {}) {
+  const sort_by = queries.sort_by ? queries.sort_by : "articles.created_at";
 
-  let SQLstring = `
-  SELECT articles.article_id,
-  title,
-  topic,
-  articles.author,
-  articles.created_at,
-  articles.votes,
-  article_img_url,
-  COUNT(comments.comment_id)::INT AS comment_count
-  FROM articles
-  LEFT JOIN comments ON articles.article_id = comments.article_id
-  GROUP BY articles.article_id`;
+  let order;
+  if (queries.order) {
+    order = queries.order.toUpperCase();
+  } else {
+    order = queries.sort_by ? "ASC" : "DESC";
+  }
 
-  let args = [];
+  const blueList = ["ASC", "DESC"];
+
+  if (!blueList.includes(order)) {
+    return Promise.reject({
+      status: 400,
+      error: "Invalid order query",
+      msg: "Invalid order query",
+    });
+  }
 
   if (sort_by) {
     const greenList = [
@@ -56,19 +57,29 @@ function fetchAllArticles(queries) {
       "comment_count",
     ];
     if (!greenList.includes(sort_by)) {
-      Promise.reject({
+      return Promise.reject({
         status: 400,
-        error: "Invalid query",
+        error: "Invalid sort query",
         msg: "Invalid sort query",
       });
-    } else if (greenList.includes(sort_by)) {
-      SQLstring += ` ORDER BY ${sort_by} ${order}`;
     }
-  } else {
-    SQLstring += ` ORDER BY articles.created_at DESC`;
   }
 
-  return db.query(SQLstring, args).then(({ rows }) => {
+  let SQLstring = `
+  SELECT articles.article_id,
+  title,
+  topic,
+  articles.author,
+  articles.created_at,
+  articles.votes,
+  article_img_url,
+  COUNT(comments.comment_id)::INT AS comment_count
+  FROM articles
+  LEFT JOIN comments ON articles.article_id = comments.article_id
+  GROUP BY articles.article_id
+  ORDER BY ${sort_by} ${order}`;
+
+  return db.query(SQLstring).then(({ rows }) => {
     return rows;
   });
 }

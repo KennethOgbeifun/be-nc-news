@@ -126,7 +126,7 @@ describe("GET /api/articles/:article_id", () => {
     });
   });
 });
-xdescribe("GET /api/articles/", () => {
+describe("GET /api/articles/", () => {
   test("200: Responds with all the articles sorted by date in desc order", () => {
     return request(app)
       .get("/api/articles")
@@ -319,7 +319,7 @@ xdescribe("GET /api/articles/", () => {
   });
 });
 
-xdescribe("GET 200: /api/articles?sort_by", () => {
+describe("GET 200: /api/articles?sort_by", () => {
   test("200: should return an array of all articles sorted by title", () => {
     return request(app)
       .get("/api/articles?sort_by=title")
