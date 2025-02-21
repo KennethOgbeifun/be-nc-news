@@ -15,7 +15,7 @@ const cors = require("cors");
 
 const port = 3000;
 
-app.use(cors());
+app.use(cors({ origin: "*" }));
 
 app.use(express.json());
 
@@ -105,7 +105,7 @@ app.use((err, req, res, next) => {
 
 app.use((err, req, res, next) => {
   console.log(err, err.error, "You have not accounted for this error yet!");
-  response.status(500).send({ msg: "Internal Server error" });
+  res.status(500).send({ msg: "Internal Server error" });
 });
 
 module.exports = app;

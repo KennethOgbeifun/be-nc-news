@@ -127,6 +127,17 @@ describe("GET /api/articles/:article_id", () => {
   });
 });
 describe("GET /api/articles/", () => {
+  test("200: Responds with all the articles filtered by topic", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then((response) => {
+        response.body.forEach((article) => {
+          expect(article.topic).toBe("mitch");
+        });
+      });
+  });
+
   test("200: Responds with all the articles sorted by date in desc order", () => {
     return request(app)
       .get("/api/articles")

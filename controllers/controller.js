@@ -41,6 +41,8 @@ function getArticle(req, res, next) {
 
 function getAllArticles(req, res, next) {
   const queries = req.query;
+  console.log(queries, "<<<<");
+
   return fetchAllArticles(queries)
     .then((articles) => {
       res.status(200).send(articles);

@@ -27,6 +27,8 @@ function fetchArticle(id) {
 }
 
 function fetchAllArticles(queries = {}) {
+  console.log(queries, "queries");
+
   const sort_by = queries.sort_by ? queries.sort_by : "articles.created_at";
 
   let order;
@@ -64,7 +66,6 @@ function fetchAllArticles(queries = {}) {
       });
     }
   }
-
   let SQLstring = `
   SELECT articles.article_id,
   title,
@@ -75,11 +76,22 @@ function fetchAllArticles(queries = {}) {
   article_img_url,
   COUNT(comments.comment_id)::INT AS comment_count
   FROM articles
-  LEFT JOIN comments ON articles.article_id = comments.article_id
-  GROUP BY articles.article_id
-  ORDER BY ${sort_by} ${order}`;
+  LEFT JOIN comments ON articles.article_id = comments.article_id`;
 
-  return db.query(SQLstring).then(({ rows }) => {
+  const queryValues = [];
+
+  if (queries.topic) {
+    SQLstring += " WHERE articles.topic = $1 ";
+    queryValues.push(queries.topic);
+  }
+
+  SQLstring += ` GROUP BY articles.article_id
+  ORDER BY ${sort_by} ${order}`;
+  console.log(SQLstring);
+
+  return db.query(SQLstring, queryValues).then(({ rows }) => {
+    console.log(rows);
+
     return rows;
   });
 }
@@ -160,6 +172,8 @@ function handleComment(article_id, username, body) {
       );
     })
     .then(({ rows }) => {
+      console.log(rows);
+
       return rows;
     });
 }
