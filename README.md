@@ -1,8 +1,11 @@
-# Northcoders News API
+# NC News API
 
 # NC News Backend
 
 A RESTful API for the NC News application, allowing users to post, comment on, and like articles. Built with Node.js, Express, and PostgreSQL/NoSQL, this server-side application provides all necessary endpoints to support a dynamic frontend.
+
+Front-end: https://roaring-churros-864840.netlify.app/
+Back-end: https://ncnews-clfh.onrender.com/api
 
 
 Table of Contents
